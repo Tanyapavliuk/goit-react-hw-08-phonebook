@@ -1,65 +1,62 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { deleteContactByID, getAllContanct } from 'redux/sliceContact';
-import Table from 'react-bootstrap/Table';
-import { nanoid } from '@reduxjs/toolkit';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import {
+  useDeleteContactMutation,
+  useGetAllContactsQuery,
+} from '../../redux/sliceContact';
+import { Skeleton } from '@chakra-ui/react';
+import { useSelector } from 'react-redux';
 
 const ListContact = () => {
-  const { contacts } = useSelector(state => state.contacts);
+  const { data, isFetching, isError, refetch } = useGetAllContactsQuery();
+  const [fnDelete] = useDeleteContactMutation();
   const filter = useSelector(state => state.filter);
-
-  const [visibleContacts, setVisibleContacts] = useState([]);
-
-  const dispatch = useDispatch();
+  console.log(filter);
 
   useEffect(() => {
-    dispatch(getAllContanct());
-  }, [dispatch]);
+    refetch();
+  }, [refetch]);
 
-  useEffect(() => {
-    const visibleContactList = () => {
-      if (contacts.length > 0) {
-        return contacts.filter(contact =>
-          contact.name.toLowerCase().includes(filter.toLowerCase())
-        );
-      }
-      return contacts;
-    };
-    setVisibleContacts(visibleContactList());
-  }, [contacts, filter]);
+  const handleDelete = e => {
+    fnDelete(e.target.id);
+    refetch();
+  };
+
+  const visibleContacts = () => {
+    if (filter) {
+      return data.filter(contact =>
+        contact.name.toLowerCase().includes(filter.toLowerCase())
+      );
+    }
+    return data;
+  };
+
+  if (isError) return <div>An error has occurred!</div>;
+
+  if (isFetching)
+    return <Skeleton startColor="#ac8813" endColor="#0b5301" height="20px" />;
 
   return (
-    <Table striped bordered hover variant="ligth">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Name</th>
-          <th>Phone</th>
-          <th>Delete</th>
-        </tr>
-      </thead>
-      <tbody>
-        {visibleContacts.map((contact, i) => (
-          <tr key={nanoid()}>
-            <td>{i + 1}</td>
-            <td>{contact.name}</td>
-            <td>{contact.phone}</td>
-            <td
-              onClick={() => {
-                dispatch(deleteContactByID(contact.id));
-              }}
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                cursor: 'pointer',
-              }}
-            >
-              <span>&#215;</span>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
+    <ul className="p-0 flex flex-col gap-y-3">
+      {visibleContacts().map(el => (
+        <li
+          key={el.id}
+          className="flex justify-between items-center bg-lime-700/40  px-3"
+        >
+          <div className="flex gap-x-2 items-center">
+            <p className="m-0 text-lg">{el.name}:</p>
+            <p className="m-0">{el.number}</p>
+          </div>
+
+          <span
+            id={el.id}
+            className=" text-[30px] cursor-pointer"
+            onClick={handleDelete}
+          >
+            &#215;
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 };
 

@@ -1,15 +1,18 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { addContanct } from 'redux/sliceContact';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
 import * as formik from 'formik';
 import * as yup from 'yup';
-import { useState } from 'react';
-import MyAlert from 'components/Alert/Alert';
-import { FloatingLabel } from 'react-bootstrap';
 
-const phoneRegExp =
-  /^[\]?3?[\s]?8?[\s]?\(?0\d{2}?\)?[\s]?\d{3}[\s|-]?\d{2}[\s|-]?\d{2}$/;
+import Form from 'react-bootstrap/Form';
+import { FloatingLabel } from 'react-bootstrap';
+import {
+  useAddNewContactMutation,
+  useGetAllContactsQuery,
+} from 'redux/sliceContact';
+import { useState } from 'react';
+import { Alert } from '@chakra-ui/react';
+import { PhoneIcon } from '@chakra-ui/icons';
+
+// const phoneRegExp =
+//   /^[\]?3?[\s]?8?[\s]?\(?0\d{2}?\)?[\s]?\d{3}[\s|-]?\d{2}[\s|-]?\d{2}$/;
 
 const mySchema = yup.object().shape({
   nameUser: yup
@@ -19,35 +22,34 @@ const mySchema = yup.object().shape({
     .required('Required'),
   phone: yup
     .string()
-    .matches(phoneRegExp, 'Phone number is not valid')
+    // .matches(phoneRegExp, 'Phone number is not valid')
     .required('Required'),
 });
 
 const FormContact = () => {
   const { Formik } = formik;
-  const dispatch = useDispatch();
-  const { contacts } = useSelector(state => state.contacts);
-
-  const [show, setShow] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [newContact] = useAddNewContactMutation();
+  const { data, refetch } = useGetAllContactsQuery();
 
   const handlerSubmit = (values, actions) => {
-    setShow(false);
-    const { nameUser, phone } = values;
+    const { nameUser: name, phone } = values;
 
-    const inArray = contacts.some(
-      contact =>
-        contact.name.toLowerCase() === nameUser.toLowerCase() &&
-        contact.phone === Number(phone)
+    const isInContacts = data.some(
+      contact => contact.name === name && contact.number === phone
     );
+    if (isInContacts) {
+      setShowAlert(true);
 
-    if (inArray) {
-      setShow(true);
+      setTimeout(() => setShowAlert(false), 3000);
       actions.resetForm();
       return;
     }
+    setShowAlert(false);
+    newContact({ name, number: phone });
 
-    dispatch(addContanct({ name: nameUser, phone }));
     actions.resetForm();
+    refetch();
   };
 
   return (
@@ -86,41 +88,26 @@ const FormContact = () => {
               <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
             </FloatingLabel>
 
-            <Button variant="outline-success" type="submit" size="lg">
-              Submit
-            </Button>
+            <button
+              type="submit"
+              className="flex items-center gap-x-2 py-3 px-5 rounded-md bg-gradient-to-r from-yellow-600/90 to-lime-900/90 hover:from-yellow-600 hover:to-lime-900 transition-all  text-white font-medium text-lg"
+            >
+              <PhoneIcon />
+              Add contact
+            </button>
           </Form>
         )}
       </Formik>
-      {show && <MyAlert show={show} shangeShow={setShow} />}
+      {showAlert && (
+        <div className="fixed top-1">
+          <Alert status="warning">
+            <PhoneIcon />
+            This contact is already in the contact list
+          </Alert>
+        </div>
+      )}
     </>
   );
 };
 
 export default FormContact;
-
-//   <Form className="w-60 flex flex-col gap-5">
-//     <Field
-//       name="nameUser"
-//       type="text"
-//       placeholder="Name"
-//       className="py-2 px-1 outline outline-offset-2 outline-1"
-//     />
-//     {errors.nameUser && touched.nameUser ? (
-//       <div>{errors.nameUser}</div>
-//     ) : null}
-//     <Field
-//       name="phone"
-//       type="number"
-//       placeholder="380 000 000 000"
-//       className="py-2 px-1 outline outline-offset-2 outline-1"
-//     />
-//     {errors.phone && touched.phone ? <div>{errors.phone}</div> : null}
-//     <button
-//       type="submit"
-//       className="py-2 px-2 border-solid border-2 border-indigo-600 hover:bg-indigo-100"
-//     >
-//       Submit
-//     </button>
-//   </Form>
-// )}
