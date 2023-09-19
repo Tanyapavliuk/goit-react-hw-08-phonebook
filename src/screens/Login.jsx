@@ -19,7 +19,11 @@ const Login = () => {
   const navigate = useNavigate();
   return (
     <Flex align="center" justify="center" h="70vh">
-      <Box bg="white" rounded="md" className="py-5 px-10 w-4/12">
+      <Box
+        bg="white"
+        rounded="md"
+        className="py-5 px-10 w-11/12 md:w-3/4 lg:w-4/12"
+      >
         <Formik
           initialValues={{
             email: '',

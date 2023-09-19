@@ -5,14 +5,14 @@ const Home = () => {
     <section className="w-full h-full flex flex-col justify-center items-center pt-20">
       <h1>
         Your
-        <span className="table uppercase text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-lime-900">
+        <span className=" container mx-auto table uppercase text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-lime-900">
           phonebook
         </span>
       </h1>
-      <p className="text-md">
+      <p className=" container mx-auto text-center text-md">
         Add, find, delete contacts when and where it's convenient for you.
       </p>
-      <div className=" mx-auto w-[780px] h-[520px]">
+      <div className="hidden md:block mx-auto w-[780px] h-[520px]">
         <iframe
           src={photo}
           title="phone"

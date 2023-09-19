@@ -21,7 +21,11 @@ const Registeration = () => {
   const navigate = useNavigate();
   return (
     <Flex align="center" justify="center" h="70vh">
-      <Box bg="wigth" rounded="md" className="py-5 px-10 w-4/12">
+      <Box
+        bg="wigth"
+        rounded="md"
+        className="py-5 px-10 w-11/12 md:w-6/12 lg:w-4/12"
+      >
         <Formik
           initialValues={{
             name: '',
