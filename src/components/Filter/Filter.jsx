@@ -9,7 +9,7 @@ const Filter = () => {
 
   return (
     <Form.Control
-      className="py-3 mb-4"
+      className=" mt-2 md:mt-0 py-3 mb-4"
       type="text"
       name="query"
       onChange={e => dispatch(changeFilter(e.target.value))}
