@@ -36,7 +36,9 @@ const FormContact = () => {
     const { nameUser: name, phone } = values;
 
     const isInContacts = data.some(
-      contact => contact.name === name && contact.number === phone
+      contact =>
+        contact.name.toLowerCase() === name.toLowerCase() &&
+        contact.number === phone
     );
     if (isInContacts) {
       setShowAlert(true);
