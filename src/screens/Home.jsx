@@ -2,7 +2,7 @@ import photo from '../images/phone.gif';
 
 const Home = () => {
   return (
-    <section className="w-full h-full flex flex-col justify-center items-center pt-20">
+    <section className="w-full h-full flex flex-col justify-center items-center pt-10">
       <h1>
         Your
         <span className=" container mx-auto table uppercase text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-lime-900">
